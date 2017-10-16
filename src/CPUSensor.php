@@ -16,24 +16,25 @@ class CPUSensor extends Sensor
 		$load    = sys_getloadavg();
 		$current = $load[0];
 
-		if ($current <= 15)
+		$cores  = 1;
+		$result = shell_exec("nproc");
+		if ($result > 0)
 		    {
-			$sleeptime = 0;
+			$cores = (int) $result;
 		    }
-		else if ($current > 15 && $current <= 30)
+
+		$log = log10($current / $cores);
+
+		if ($log > 0)
 		    {
-			$sleeptime = 5;
-		    }
-		else if ($current > 30 && $current <= 50)
-		    {
-			$sleeptime = 10;
+			$sleep = round($log * 60);
+			return $sleep;
 		    }
 		else
 		    {
-			$sleeptime = 60;
-		    } //end if
+			return 0;
+		    }
 
-		return $sleeptime;
 	    } //end calculate()
 
 
